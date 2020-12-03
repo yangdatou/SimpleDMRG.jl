@@ -11,16 +11,14 @@ Part of matrix product state would be diagrammatically represented,
 
 """
 
-struct MatrixProductState{T<:Number} <: TensorProduct
-    _data::Vector{StateTensor}
+struct MatrixProductState{T<:Number} <: AbstractTensor
+    _data::Vector{Array{T,3}}
 end
 
-function MatrixProductState(mps_tensors::Vector{Array{T,3}}) where {T}
-    return new([StateTensor(t) for t in mps_tensors])
-end
+Base.eltype(::Type{MatrixProductState{T}}) where {T} = T
 
-function get_data(t::MatrixProductState{T}, l::Int) where {T}
-    return t._data[l]._data::Array{T,3}
+function get_data(the_mps::MatrixProductState{T}, l::Int) where {T}
+    return the_mps._data[l]::Array{T,3}
 end
 
 function get_sys_size(the_mps::MatrixProductState{T})::Int where {T}
@@ -28,7 +26,8 @@ function get_sys_size(the_mps::MatrixProductState{T})::Int where {T}
 end
 
 function get_phys_dim(the_mps::MatrixProductState)::Int
-    return length(the_mps[2][1, 1, :])
+    tmp_tensor = get_data(the_mps, 2)
+    return length(tmp_tensor[1, 1, :])
 end
 
 function get_bond_dims(the_mps::MatrixProductState)::Array{Tuple{Int,Int},1}
@@ -58,8 +57,8 @@ function Base.show(io::IO, ::MIME"text/plain", the_mps::MatrixProductState{T}) w
 end
 
 function _show_mps_dims(io::IO, sys_size::Int, phys_dim::Int, bond_dims::Array{Tuple{Int,Int},1})
-    println(io, "  Physical dimension: $phys_dim")
-    print(io,   "  Bond dimensions:   ")
+    println(io,   "  Physical dimension: $phys_dim")
+    println(io,   "  Bond dimensions:")
     if sys_size > 4
         for i in 1:4
             print(io, bond_dims[i], " × ")
@@ -75,7 +74,7 @@ end
 
 function Base.show(io::IO, the_mps::MatrixProductState)
     sys_size  = get_sys_size(the_mps)
-    print(io, "MPS on $sys_size sites")
+    print(io, "Matrix Product State on $sys_size sites")
 end
 
 function Base.adjoint(the_mps::MatrixProductState{T}) where {T}
@@ -109,10 +108,15 @@ end
 
 function Base.show(io::IO, the_adj_mps::Adjoint{T, MatrixProductState{T}}) where {T}
     sys_size  = get_sys_size(the_adj_mps)
-    print(io, "Adjoint MPS on $sys_size sites")
+    print(io, "Adjoint Matrix Product State on $sys_size sites")
 end
 
 function Base.getindex(the_mps::Adjoint{T, MatrixProductState{T}}, args...) where {T}
-    out = Base.getindex(reverse(the_mps.parent.tensors), args...)
+    out = Base.getindex(the_mps.parent._data, args...)
+    return permutedims(conj.(out), (2, 1, 3))
+end
+
+function get_data(the_mps::Adjoint{T, MatrixProductState{T}}, l::Int) where {T}
+    out = get_data(the_mps.parent, l)::Array{T,3}
     return permutedims(conj.(out), (2, 1, 3))
 end

@@ -8,7 +8,7 @@ sx_matrix   = [0.0 0.5;  0.5  0.0]
 sp_matrix   = [0.0 1.0;  0.0  0.0]
 sm_matrix   = [0.0 0.0;  1.0  0.0]
 
-struct IsingModel{FloatType<:Real} <: SpinModel
+struct IsingModel{T<:Number} <: SpinModel
     # construct local operator for Ising model
     # - h:  strength of external field
     # - J:  coupling constant
@@ -16,17 +16,17 @@ struct IsingModel{FloatType<:Real} <: SpinModel
 
     phy_dim::Int
     op_dim ::Int
-    h_val  ::FloatType
-    j_val  ::FloatType
+    h_val  ::T
+    j_val  ::T
 end
 
-function IsingModel(h_val::Number, j_val::Number; FloatType=Float64)
+function IsingModel(h_val::Number, j_val::Number; T=Float64)
     phy_dim = 2
     op_dim  = 3
-    return IsingModel{FloatType}(phy_dim, op_dim, h_val::FloatType, j_val::FloatType)
+    return IsingModel{T}(phy_dim, op_dim, h_val::T, j_val::T)
 end
 
-struct HeisenbergModel{FloatType<:Real} <: SpinModel
+struct HeisenbergModel{T<:Number} <: SpinModel
     # construct local operator for Heisenberg model
     # - h:  strength of external field
     # - J:  coupling constant
@@ -36,28 +36,28 @@ struct HeisenbergModel{FloatType<:Real} <: SpinModel
     phy_dim::Int
     op_dim ::Int
 
-    h_val  ::FloatType
-    j_val  ::FloatType
-    jz_val ::FloatType
+    h_val  ::T
+    j_val  ::T
+    jz_val ::T
 end
 
-function HeisenbergModel(h_val::Number, j_val::Number, jz_val::Number; FloatType=Float64)
+function HeisenbergModel(h_val::Number, j_val::Number, jz_val::Number; T=Float64)
     phy_dim = 2
     op_dim  = 5
-    return HeisenbergModel{FloatType}(phy_dim, op_dim, h_val::FloatType, j_val::FloatType, jz_val::FloatType)
+    return HeisenbergModel{T}(phy_dim, op_dim, h_val::T, j_val::T, jz_val::T)
 end
 
 function get_phys_dim(m::ModelSystem)
     return m.phy_dim
 end
 
-function get_local_operator_tensor(model::IsingModel; FloatType=Float64)
+function get_local_operator_tensor(model::IsingModel{T}) where {T}
     n  = model.op_dim
     m  = model.phy_dim
     h  = model.h_val
     j  = model.j_val
 
-    tmp = zeros(FloatType,n,n,m,m)
+    tmp = zeros(T,n,n,m,m)
 
     tmp[1,1,:,:] = id_matrix
     tmp[3,3,:,:] = id_matrix
@@ -66,17 +66,17 @@ function get_local_operator_tensor(model::IsingModel; FloatType=Float64)
     tmp[3,1,:,:] = -h*sx_matrix
     tmp[3,2,:,:] = -j*sz_matrix
 
-    return tmp
+    return tmp::Array{T,4}
 end
 
-function get_local_operator_tensor(model::HeisenbergModel)
+function get_local_operator_tensor(model::HeisenbergModel{T}) where {T}
     n  = model.op_dim
     m  = model.phy_dim
     h  = model.h_val
     j  = model.j_val
     jz = model.jz_val
 
-    tmp = zeros(n,n,m,m)
+    tmp = zeros(T,n,n,m,m)
 
     tmp[1,1,:,:] = id_matrix
     tmp[5,5,:,:] = id_matrix
@@ -90,5 +90,5 @@ function get_local_operator_tensor(model::HeisenbergModel)
     tmp[5,3,:,:] = (j/2)*sp_matrix 
     tmp[5,4,:,:] = jz   *sz_matrix
 
-    return tmp
+    return tmp::Array{T,4}
 end

@@ -8,33 +8,32 @@ Part of matrix product operator would be diagrammatically represented,
    last_rho            this_rho            next_rho
 """
 
-struct MatrixProductOperator{T<:Number} <: TensorProduct
-    _data::OperatorTensor
+struct MatrixProductOperator{T<:Number} <: AbstractTensor
+    _data::Vector{Array{T,4}}
 end
 
 function MatrixProductOperator(w::Array{T,4}, sys_size::Int) where {T}
     sys_size >= 2 || throw(DomainError(sys_size, "sys_size shoule be larger than 2"))
 
-    n  = size(w)[1]::Int
-    m  = size(w)[3]::Int
+    tmp_mpo_tensors    = Vector{Array{T,4}}(undef, sys_size)
+    tmp_mpo_tensors[1] = w[end:end, :, :, :]::Array{T,4}
 
-    mpo_tensors    = Vector{OperatorTensor}(undef, sys_size)
-    mpo_tensors[1] = OperatorTensor(w[end:end, :, :, :])
     for l in 2:(sys_size-1)
-        mpo_tensors[l] = OperatorTensor(w)
+        tmp_mpo_tensors[l] = w::Array{T,4}
     end
-    mpo_tensors[sys_size] = OperatorTensor(w[:, 1:1, :, :])
-    return MatrixProductOperator{T}(mpo_tensors)
+
+    tmp_mpo_tensors[sys_size] = w[:, 1:1, :, :]::Array{T,4}
+    return MatrixProductOperator{T}(tmp_mpo_tensors)
 end
 
-function MatrixProductOperator(m::ModelSystem, sys_size::Int)
+function get_mpo(m::ModelSystem, sys_size::Int)
     sys_size >= 2 || throw(DomainError(sys_size, "sys_size shoule be larger than 2"))
     w = get_local_operator_tensor(m)
     return MatrixProductOperator(w, sys_size)
 end
 
-function get_data(t::MatrixProductOperator{T}, l::Int) where {T}
-    return t._data[l]._data::Array{T,4}
+function get_data(the_mpo::MatrixProductOperator{T}, l::Int) where {T}
+    return the_mpo._data[l]::Array{T,4}
 end
 
 function get_sys_size(the_mpo::MatrixProductOperator{T})::Int where {T}
@@ -62,8 +61,8 @@ function Base.show(io::IO, ::MIME"text/plain", the_mpo::MatrixProductOperator)
 end
 
 function _show_mpo_dims(io::IO, sys_size::Int, phys_dim::Int, bond_dims::Array{Tuple{Int,Int},1})
-    println(io, "  Physical dimension: $phys_dim")
-    print(io,   "  Bond dimensions:   ")
+    println(io,   "  Physical dimension: $phys_dim")
+    println(io,   "  Bond dimensions:")
     if sys_size > 4
         for i in 1:4
             print(io, bond_dims[i], " × ")
