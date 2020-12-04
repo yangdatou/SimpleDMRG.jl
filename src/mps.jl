@@ -43,8 +43,16 @@ end
 
 function get_randn_mps(m::ModelSystem, sys_size::Int, bond_dim::Int; T=Float64)
     phys_dim = get_phys_dim(m)
-    return get_randn_mps(phys_dim::Int, sys_size::Int, bond_dim::Int, T=T)::MatrixProductState{T}
+    return get_randn_mps(phys_dim, sys_size, bond_dim, T=T)
 end
+
+function get_randn_mps(m::ModelSystem, bond_dims::Vector{Tuple{Int,Int}}; T=Float64)
+    phys_dim = get_phys_dim(m)
+    temp_mps_tensors = [randn(T, bond_dim[1], bond_dim[2], phys_dim) for bond_dim in bond_dims]
+    return MatrixProductState{T}(temp_mps_tensors) |> left_canonical |> right_canonical
+end
+
+Base.copy(the_mps::MatrixProductState{T}) where {T} = MatrixProductState{T}(the_mps._data)
 
 function Base.show(io::IO, ::MIME"text/plain", the_mps::MatrixProductState{T}) where {T}
     sys_size  = get_sys_size(the_mps)

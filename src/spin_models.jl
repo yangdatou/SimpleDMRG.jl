@@ -1,12 +1,12 @@
 abstract type ModelSystem              end
 abstract type SpinModel <: ModelSystem end
 
-zero_matrix = [0.0 0.0;  0.0  0.0]
-id_matrix   = [1.0 0.0;  0.0  1.0]
-sz_matrix   = [0.5 0.0;  0.0 -0.5]
-sx_matrix   = [0.0 0.5;  0.5  0.0]
-sp_matrix   = [0.0 1.0;  0.0  0.0]
-sm_matrix   = [0.0 0.0;  1.0  0.0]
+const zero_matrix = [0.0 0.0;  0.0  0.0]
+const id_matrix   = [1.0 0.0;  0.0  1.0]
+const sz_matrix   = [1.0 0.0;  0.0 -1.0]
+const sx_matrix   = [0.0 1.0;  1.0  0.0]
+const sp_matrix   = [0.0 1.0;  0.0  0.0]
+const sm_matrix   = [0.0 0.0;  1.0  0.0]
 
 struct IsingModel{T<:Number} <: SpinModel
     # construct local operator for Ising model
@@ -20,7 +20,7 @@ struct IsingModel{T<:Number} <: SpinModel
     j_val  ::T
 end
 
-function IsingModel(h_val::Number, j_val::Number; T=Float64)
+function IsingModel(h_val, j_val; T=Float64)
     phy_dim = 2
     op_dim  = 3
     return IsingModel{T}(phy_dim, op_dim, h_val::T, j_val::T)
@@ -41,7 +41,7 @@ struct HeisenbergModel{T<:Number} <: SpinModel
     jz_val ::T
 end
 
-function HeisenbergModel(h_val::Number, j_val::Number, jz_val::Number; T=Float64)
+function HeisenbergModel(h_val, j_val, jz_val; T=Float64)
     phy_dim = 2
     op_dim  = 5
     return HeisenbergModel{T}(phy_dim, op_dim, h_val::T, j_val::T, jz_val::T)

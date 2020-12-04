@@ -1,11 +1,13 @@
 
 module SimpleDMRG
-    using LinearAlgebra, TensorOperations, TensorCast, LowRankApprox, Arpack, Strided, SparseArrays
+    using LinearAlgebra, TensorOperations, TensorCast
+    using LowRankApprox, Arpack, Strided, SparseArrays
+    using Printf
 
     export *, adjoint, getindex
     export MatrixProductOperator, MatrixProductState
     export HeisenbergModel, IsingModel
-    export get_randn_mps, get_local_operator_tensor, get_mpo
+    export get_randn_mps, get_local_operator_tensor, get_mpo, get_bond_dims
     export contraction
     export left_canonical, right_canonical
 

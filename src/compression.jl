@@ -1,5 +1,3 @@
-max_int = typemax(Int)
-
 function left_canonical(the_mps::MatrixProductState{T}; d_cut::Int=max_int) where {T}
     sys_size          = get_sys_size(the_mps)
     phys_dim          = get_phys_dim(the_mps)
