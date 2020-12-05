@@ -26,10 +26,10 @@ function MatrixProductOperator(w::Array{T,4}, sys_size::Int) where {T}
     return MatrixProductOperator{T}(tmp_mpo_tensors)
 end
 
-function get_mpo(m::ModelSystem, sys_size::Int)
+function get_mpo(m::ModelSystem{T}, sys_size::Int) where {T}
     sys_size >= 2 || throw(DomainError(sys_size, "sys_size shoule be larger than 2"))
     w = get_local_operator_tensor(m)
-    return MatrixProductOperator(w, sys_size)
+    return MatrixProductOperator(w::Array{T,4}, sys_size)
 end
 
 function get_data(the_mpo::MatrixProductOperator{T}, l::Int) where {T}

@@ -11,7 +11,7 @@ Part of matrix product state would be diagrammatically represented,
 
 """
 
-struct MatrixProductState{T<:Number} <: AbstractTensor
+mutable struct MatrixProductState{T<:Number} <: AbstractTensor
     _data::Vector{Array{T,3}}
 end
 
@@ -46,8 +46,7 @@ function get_randn_mps(m::ModelSystem, sys_size::Int, bond_dim::Int; T=Float64)
     return get_randn_mps(phys_dim, sys_size, bond_dim, T=T)
 end
 
-function get_randn_mps(m::ModelSystem, bond_dims::Vector{Tuple{Int,Int}}; T=Float64)
-    phys_dim = get_phys_dim(m)
+function get_randn_mps(phys_dim::Int, bond_dims::Vector{Tuple{Int,Int}}; T=Float64)
     temp_mps_tensors = [randn(T, bond_dim[1], bond_dim[2], phys_dim) for bond_dim in bond_dims]
     return MatrixProductState{T}(temp_mps_tensors) |> left_canonical |> right_canonical
 end

@@ -19,7 +19,7 @@ end
 
 function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T},
                 left_blocks::Vector{Array{T, 3}}, right_blocks::Vector{Array{T, 3}};
-                verbose=3, d_cut::Int=max_int) where {T}
+                verbose=3, max_bond_dim::Int=max_int) where {T}
     e_right   = zero(T)
     e_left    = zero(T)
     sys_size  = get_sys_size(the_mps)
@@ -57,7 +57,7 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
         new_mps_vector        = eig_vecs[:,1]::Vector{T}
 
         @cast new_mps_matrix[(sgm, last_b), this_b] := new_mps_vector[(sgm, last_b, this_b)] (last_b:b1, this_b:b2, sgm:phys_dim)
-        u, s, v               = psvd(new_mps_matrix, rank=d_cut)
+        u, s, v               = psvd(new_mps_matrix, rank=max_bond_dim)
         @cast new_mps_tensor[last_b, this_b, sgm] := u[(sgm, last_b), this_b] (sgm:phys_dim)
         the_mps[l]            = new_mps_tensor::Array{T,3}
 
@@ -96,7 +96,7 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
         new_mps_vector        = eig_vecs[:,1]::Vector{T}
 
         @cast new_mps_matrix[(sgm, last_b), this_b] := new_mps_vector[(sgm, last_b, this_b)] (last_b:b1, this_b:b2, sgm:phys_dim)
-        u, s, v               = psvd(new_mps_matrix, rank=d_cut)
+        u, s, v               = psvd(new_mps_matrix, rank=max_bond_dim)
         @cast new_mps_tensor[last_b, this_b, sgm] := v'[(sgm, last_b), this_b] (sgm:phys_dim)
         the_mps[l]            = new_mps_tensor::Array{T,3}
 
@@ -117,11 +117,10 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
     return e_left, e_right
 end
 
-function kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOperator{T}; iter_max=10, verbose=3, tol=1e-8, d_cut::Int=max_int) where {T}
+function kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOperator{T}; iter_max::Int=10, verbose::Int=3, tol::Real=1e-8, max_bond_dim::Int=max_int) where {T}
     the_mps      = copy(the_mps_init)
 
     verbose<3 || println("Computing right expressions")
-
     left_blocks  = Vector{Array{T,3}}(undef, sys_size)
     right_blocks = Vector{Array{T,3}}(undef, sys_size)
 
@@ -131,7 +130,7 @@ function kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOpera
     enable_cache(maxsize=5*100000)
 
     while not(is_converged) && iter_num < iter_max
-        e_left, e_right = sweep!(the_mps, the_mpo, left_blocks, right_blocks, verbose=verbose, d_cut=d_cut)
+        e_left, e_right = sweep!(the_mps, the_mpo, left_blocks, right_blocks, verbose=verbose, max_bond_dim=max_bond_dim)
         iter_num += 1
 
         if is_eigen(the_mps, the_mpo, tol=tol)
@@ -141,23 +140,25 @@ function kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOpera
         end
     end
 
+    if not(is_converged)
+        verbose < 3 || println("Converged in $iter_num iterations")
+    end
+
     clear_cache()
     return the_mps, ene0
 end
 
-function kernel(the_mpo::MatrixProductOperator{T}; iter_max::Int=10, verbose::Int=3, tol::Real=1e-8, T=Float64, d_cut::Int=max_int) where {T}
-    bond_dims     = get_bond_dims(the_mpo)::Vector{Tuple{Int,Int}}
-    the_mps_init  = get_randn_mps(m, bond_dims, T=T)::MatrixProductState{T}
+function kernel(the_mpo::MatrixProductOperator{T}; iter_max::Int=10, verbose::Int=5, tol::Real=1e-8, max_bond_dim::Int=50) where {T}
+    phys_dim      = get_phys_dim(the_mpo)::Int
+    sys_size      = get_sys_size(the_mpo)::Int
+    the_mps_init  = get_randn_mps(phys_dim, sys_size, max_bond_dim, T=T)::MatrixProductState{T}
 
-    the_mps, ene0 = kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOperator, iter_max=iter_max, verbose=verbose, tol=tol, d_cut=d_cut)
+    the_mps, ene0 = kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOperator{T}, iter_max=iter_max, verbose=verbose, tol=tol, max_bond_dim=max_bond_dim)
     return the_mps, ene0
 end
 
-function kernel(m::ModelSystem, sys_size::Int; iter_max=10, verbose=3, tol=1e-8, T=Float64, d_cut::Int=max_int)
+function kernel(m::ModelSystem, sys_size::Int; iter_max=10, verbose::Int=5, tol::Real=1e-8, max_bond_dim::Int=50, T=Float64)
     the_mpo       = get_mpo(m, sys_size)::MatrixProductOperator{T}
-    bond_dims     = get_bond_dims(the_mpo)::bond_dims::Vector{Tuple{Int,Int}}
-    the_mps_init  = get_randn_mps(m, bond_dims, T=T)::MatrixProductState{T}
-
-    the_mps, ene0 = kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOperator, iter_max=iter_max, verbose=verbose, tol=tol, d_cut=d_cut)
+    the_mps, ene0 = kernel(the_mpo::MatrixProductOperator{T}, iter_max=iter_max, verbose=verbose, tol=tol, max_bond_dim=max_bond_dim)
     return the_mps, ene0
 end

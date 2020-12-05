@@ -1,5 +1,5 @@
-abstract type ModelSystem              end
-abstract type SpinModel <: ModelSystem end
+abstract type ModelSystem{T<:Number}                 end
+abstract type SpinModel{T<:Number} <: ModelSystem{T} end
 
 const zero_matrix = [0.0 0.0;  0.0  0.0]
 const id_matrix   = [1.0 0.0;  0.0  1.0]
@@ -8,7 +8,7 @@ const sx_matrix   = [0.0 1.0;  1.0  0.0]
 const sp_matrix   = [0.0 1.0;  0.0  0.0]
 const sm_matrix   = [0.0 0.0;  1.0  0.0]
 
-struct IsingModel{T<:Number} <: SpinModel
+struct IsingModel{T<:Number}      <: SpinModel{T}
     # construct local operator for Ising model
     # - h:  strength of external field
     # - J:  coupling constant
@@ -26,7 +26,7 @@ function IsingModel(h_val, j_val; T=Float64)
     return IsingModel{T}(phy_dim, op_dim, h_val::T, j_val::T)
 end
 
-struct HeisenbergModel{T<:Number} <: SpinModel
+struct HeisenbergModel{T<:Number} <: SpinModel{T}
     # construct local operator for Heisenberg model
     # - h:  strength of external field
     # - J:  coupling constant
@@ -47,7 +47,7 @@ function HeisenbergModel(h_val, j_val, jz_val; T=Float64)
     return HeisenbergModel{T}(phy_dim, op_dim, h_val::T, j_val::T, jz_val::T)
 end
 
-function get_phys_dim(m::ModelSystem)
+function get_phys_dim(m::ModelSystem{T}) where {T}
     return m.phy_dim
 end
 
