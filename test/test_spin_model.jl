@@ -3,9 +3,7 @@ using Printf
 include("../src/SimpleDMRG.jl")
 using .SimpleDMRG
                                                                                                                         
-im_model = IsingModel(1.0, 1.0)
-hm_model = HeisenbergModel(1.0, 1.0, 1.0)
-
+im_model = IsingModel(1.0, 1.0, T=ComplexF64)
 tmp = get_local_operator_tensor(im_model)
 println("\n##################################")
 println("Ising modle local operator matrix:")
@@ -18,6 +16,7 @@ for i in 1:3
     end
 end
 
+hm_model = HeisenbergModel(1.0, 1.0, 1.0, T=ComplexF64)
 tmp = get_local_operator_tensor(hm_model)
 println("\n#######################################")
 println("Heisenberg model local operator matrix:")

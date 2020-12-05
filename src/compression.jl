@@ -18,7 +18,7 @@ function left_canonical!(the_mps::MatrixProductState{T}; max_bond_dim::Int=50) w
         new_mps_tensors[l] = tmp
     end
 
-    return MatrixProductState{T}(new_mps_tensors)
+    the_mps._data = new_mps_tensors::Vector{Array{T,3}}
 end
 
 function right_canonical!(the_mps::MatrixProductState{T}; max_bond_dim::Int=50) where {T}
@@ -41,5 +41,5 @@ function right_canonical!(the_mps::MatrixProductState{T}; max_bond_dim::Int=50) 
         new_mps_tensors[l] = tmp
     end
 
-    return MatrixProductState{T}(new_mps_tensors)
+    the_mps._data = new_mps_tensors::Vector{Array{T,3}}
 end

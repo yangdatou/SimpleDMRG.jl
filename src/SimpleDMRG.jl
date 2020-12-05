@@ -8,13 +8,14 @@ module SimpleDMRG
     export MatrixProductOperator, MatrixProductState
     export HeisenbergModel, IsingModel
     export get_randn_mps, get_local_operator_tensor, get_mpo, get_bond_dims
-    export contraction
-    export left_canonical, right_canonical
+    export contraction, kernel
+    export left_canonical!, right_canonical!
 
     include("utils.jl")
     include("spin_models.jl")
     include("mpo.jl")
     include("mps.jl")
+    include("kernel.jl")
     include("compression.jl")
     include("contraction.jl")
 

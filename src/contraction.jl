@@ -12,22 +12,21 @@ representing
 """
 function contraction(the_adj_mps::Adjoint{T, MatrixProductState{T}}, the_mps::MatrixProductState{T}) where {T}
     sys_size  = get_sys_size(the_mps)
-    the_mps1 = the_adj_mps.parent
-    the_mps2 = the_mps
 
-    tmp_mps_tensor1::Array{T,3} = get_data(the_mps1, 1)
-    tmp_mps_tensor2::Array{T,3} = get_data(the_mps2, 1)
-    @tensor tmp[this_b, this_a]  := tmp_mps_tensor1[last_b, this_b, sgm] * tmp_mps_tensor2[last_b, this_a, sgm]
+    tmp_mps_tensor1::Array{T,3} = get_data(the_adj_mps, 1)
+    tmp_mps_tensor2::Array{T,3} = get_data(the_mps, 1)
+    @tensor tmp[this_b, this_a]  := tmp_mps_tensor1[this_b, last_b, sgm] * tmp_mps_tensor2[last_b, this_a, sgm]
 
     for l in 2:sys_size-1
-        tmp_mps_tensor1  = get_data(the_mps1, l)
-        tmp_mps_tensor2  = get_data(the_mps2, l)
-        @tensor tmp[this_b, this_a] := tmp_mps_tensor1[last_b, this_b, sgm] * tmp[last_b, last_a] * tmp_mps_tensor2[last_a, this_a, sgm]
+        tmp_mps_tensor1  = get_data(the_adj_mps, l)
+        tmp_mps_tensor2  = get_data(the_mps, l)
+        @tensor new[this_b, this_a] := tmp_mps_tensor1[this_b, last_b, sgm] * tmp[last_b, last_a] * tmp_mps_tensor2[last_a, this_a, sgm]
+        tmp = new::Array{T,2}
     end
 
-    tmp_mps_tensor1 = get_data(the_mps1, sys_size)
-    tmp_mps_tensor2 = get_data(the_mps2, sys_size)
-    @tensor tmp[] := tmp[bl, al] * tmp_mps_tensor1[bl, 1, sgm] * tmp_mps_tensor2[al, 1, sgm]
+    tmp_mps_tensor1 = get_data(the_adj_mps, sys_size)
+    tmp_mps_tensor2 = get_data(the_mps, sys_size)
+    @tensor tmp[] := tmp[last_b, last_a] * tmp_mps_tensor1[this_b, last_b, sgm] * tmp_mps_tensor2[last_a, this_b, sgm]
 
     return tmp[1]::T
 end
