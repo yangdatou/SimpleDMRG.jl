@@ -1,9 +1,9 @@
 # SimpleDMRG.jl
 
-This is a package-in-progress in which I am implementing the [https://en.wikipedia.org/wiki/Density_matrix_renormalization_group](DMRG)
-algorithm over matrix product states as explained in Schollwöck's [https://www.sciencedirect.com/science/article/pii/S0003491610001752](The
+This is a package-in-progress in which I am implementing the [DMRG](https://en.wikipedia.org/wiki/Density_matrix_renormalization_group)
+algorithm over matrix product states as explained in Schollwöck's [The
 density-matrix renormalization group in the age of matrix product
-states). See,
+states](https://www.sciencedirect.com/science/article/pii/S0003491610001752). See,
 
 * Eric Jeckelmann, *Density-Matrix Renormalization Group Algorithms*, 2008
 * Ulrich Schollwöck, *The Density-Matrix Renormalization Group* 2005
