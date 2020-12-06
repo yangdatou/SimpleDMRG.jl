@@ -39,7 +39,7 @@ struct HeisenbergModel{T<:Number} <: SpinModel{T}
     bond_dim ::Int
 
     h_val  ::T
-    j_val  ::T
+    j_val  ::T   
     jz_val ::T
 end
 
@@ -68,12 +68,12 @@ struct HubbardModel{T<:Number} <: SpinModel{T}
 end
 
 function HubbardModel(u_val, mu_val; T=Float64)
-    phy_dim   = 2
-    bond_dim  = 5
+    phy_dim   = 4
+    bond_dim  = 6
 
     u_val_     = convert(T, u_val)::T
     mu_val_    = convert(T, mu_val)::T
-    return HeisenbergModel{T}(phy_dim, bond_dim, u_val_::T, mu_val_::T)
+    return HubbardModel{T}(phy_dim, bond_dim, u_val_::T, mu_val_::T)
 end
 
 function get_phys_dim(m::ModelSystem{T}) where {T}

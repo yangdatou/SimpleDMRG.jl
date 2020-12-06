@@ -14,7 +14,7 @@ progress but *not* warnings due to non-convergence.
 """
 function is_eigen(the_mpo::MatrixProductOperator{T}, the_mps::MatrixProductState{T}; tol=1e-8) where {T}
     isapprox(the_mps' * the_mps, one(T), rtol=tol) || error("the_mps is not canonicalized")
-    return isapprox(the_mps' * (the_mpo * the_mpo * the_mps), (the_mps' * (the_mpo * the_mps))^2, rtol=tol)
+    return isapprox((the_mps' * the_mpo) * (the_mpo * the_mps), (the_mps' * (the_mpo * the_mps))^2, rtol=tol)
 end
 
 function eig(left_block::Array{T,3}, right_block::Array{T,3}, mpo_tensor::Array{T,4};

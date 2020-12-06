@@ -3,20 +3,23 @@ using Printf
 include("../src/SimpleDMRG.jl")
 using .SimpleDMRG
 
-nn = 100
+nn           = 20
+max_bond_dim = 1000
 
-im_model = IsingModel(1.0, 1.0, T=ComplexF64)
-im_mps   = get_randn_mps(im_model, nn)
-display(im_mps)
-println("im_mps = ", im_mps)
-display(im_mps')
-println("im_mps' = ", im_mps')
-@time println("im_mps'* im_mps = ", im_mps'*im_mps)
+function test_mps(m::ModelSystem{T}, nn::Int) where T
+    psi     = get_randn_mps(m, nn, bond_dim=max_bond_dim)
+    
+    println("psi  = ", psi)
+    display(psi)
+    println("psi' = ", psi')
+    display(psi')
+    @time println("psi'*psi = ", psi'*psi)
+end
 
-hm_model = HeisenbergModel(1.0, 1.0, 1.0, T=ComplexF64)
-hm_mps   = get_randn_mps(hm_model, nn)
-display(hm_mps)
-println("hm_mps = ", hm_mps)
-display(hm_mps')
-println("hm_mps' = ", hm_mps')
-@time println("hm_mps'* hm_mps = ", hm_mps'*hm_mps)
+
+ising_model = IsingModel(1.0, 1.0, T=ComplexF64)
+test_mps(ising_model, nn)
+heis_model  = HeisenbergModel(1.0, 1.0, 1.0, T=ComplexF64)
+test_mps(heis_model,  nn)
+hub_model   = HubbardModel(1.0, 1.0, T=ComplexF64)
+test_mps(hub_model,   nn)
