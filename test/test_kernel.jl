@@ -1,8 +1,8 @@
 include("../src/SimpleDMRG.jl")
 using .SimpleDMRG
 
-nn           = 10
-max_bond_dim = 1000
+nn           = 5
+max_bond_dim = 100
 
 function test_kernel(m::ModelSystem{T}, nn::Int) where T    
     @time psi, e   = kernel(m, nn, verbose=5, max_bond_dim=max_bond_dim)
@@ -15,8 +15,6 @@ function test_kernel(m::ModelSystem{T}, nn::Int) where T
 end
 
 ising_model = IsingModel(1.0, 1.0, T=ComplexF64)
-test_kernel(ising_model, nn)
-heis_model  = HeisenbergModel(1.0, 1.0, 1.0, T=ComplexF64)
-test_kernel(heis_model, nn)
-hub_model   = HubbardModel(1.0, 1.0, T=ComplexF64)
-test_kernel(hub_model, nn)
+test_kernel(ising_model, 7)
+hub_model   = HubbardModel(3.0, -1.0, T=ComplexF64)
+test_kernel(hub_model,   4)

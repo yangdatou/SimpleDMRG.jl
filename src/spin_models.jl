@@ -89,11 +89,10 @@ function get_local_operator_tensor(model::IsingModel{T}) where {T}
     tmp = zeros(T,n,n,m,m)
 
     tmp[1,1,:,:] = id_matrix
-    tmp[3,3,:,:] = id_matrix
-
-    tmp[2,1,:,:] = sz_matrix
+    tmp[2,1,:,:] = -sz_matrix
     tmp[3,1,:,:] = -h*sx_matrix
-    tmp[3,2,:,:] = -j*sz_matrix
+    tmp[3,2,:,:] = j*sz_matrix
+    tmp[3,3,:,:] = id_matrix
 
     return tmp::Array{T,4}
 end
