@@ -154,14 +154,14 @@ end
 function kernel(the_mpo::MatrixProductOperator{T}; iter_max::Int=10, verbose::Int=5, tol::Real=1e-8, max_bond_dim::Int=50) where {T}
     phys_dim      = get_phys_dim(the_mpo)::Int
     sys_size      = get_sys_size(the_mpo)::Int
-    the_mps_init  = get_randn_mps(phys_dim, sys_size, bond_dim=max_bond_dim, T=T)::MatrixProductState{T}
+    the_mps_init  = build_randn_mps(phys_dim, sys_size, bond_dim=max_bond_dim, T=T)::MatrixProductState{T}
 
     the_mps, ene0 = kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOperator{T}, iter_max=iter_max, verbose=verbose, tol=tol, max_bond_dim=max_bond_dim)
     return the_mps, ene0
 end
 
 function kernel(m::ModelSystem{T}, sys_size::Int; iter_max=10, verbose::Int=5, tol::Real=1e-8, max_bond_dim::Int=50) where {T}
-    the_mpo       = get_mpo(m, sys_size)::MatrixProductOperator{T}
+    the_mpo       = build_mpo(m, sys_size)::MatrixProductOperator{T}
     the_mps, ene0 = kernel(the_mpo::MatrixProductOperator{T}, iter_max=iter_max, verbose=verbose, tol=tol, max_bond_dim=max_bond_dim)
     return the_mps, ene0
 end

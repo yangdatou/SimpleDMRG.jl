@@ -7,7 +7,7 @@ nn           = 20
 max_bond_dim = 1000
 
 function test_mps(m::ModelSystem{T}, nn::Int) where T
-    psi     = get_randn_mps(m, nn, bond_dim=max_bond_dim)
+    psi     = build_randn_mps(m, nn, bond_dim=max_bond_dim)
     
     println("psi  = ", psi)
     display(psi)

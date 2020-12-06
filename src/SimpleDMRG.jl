@@ -7,7 +7,7 @@ module SimpleDMRG
     export *, adjoint, getindex
     export MatrixProductOperator, MatrixProductState
     export ModelSystem, IsingModel, HeisenbergModel, HubbardModel
-    export get_randn_mps, get_local_operator_tensor, get_mpo, get_bond_dims
+    export build_randn_mps, get_local_operator_tensor, build_mpo, get_bond_dims
     export contraction, kernel
     export left_canonical!, right_canonical!
 

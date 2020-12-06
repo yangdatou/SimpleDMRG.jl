@@ -26,7 +26,7 @@ function MatrixProductOperator(w::Array{T,4}, sys_size::Int) where {T}
     return MatrixProductOperator{T}(tmp_mpo_tensors)
 end
 
-function get_mpo(m::ModelSystem{T}, sys_size::Int) where {T}
+function build_mpo(m::ModelSystem{T}, sys_size::Int) where {T}
     sys_size >= 2 || throw(DomainError(sys_size, "sys_size shoule be larger than 2"))
     w = get_local_operator_tensor(m)
     return MatrixProductOperator(w::Array{T,4}, sys_size)
@@ -48,6 +48,14 @@ function get_bond_dims(the_mpo::MatrixProductOperator)::Array{Tuple{Int,Int},1}
     sys_size  = get_sys_size(the_mpo)
     bond_dims = [size(the_mpo[i][:, :, 1, 1]) for i in 1:sys_size]
     return bond_dims
+end
+
+function Base.getindex(the_mpo::MatrixProductOperator{T}, i::Int) where {T}
+    return Base.getindex(the_mpo._data, i)::Array{T,4}
+end
+
+function Base.setindex!(the_mpo::MatrixProductOperator{T}, t::Array{T,4}, i::Int) where {T}
+    Base.setindex!(the_mpo._data, t, i)
 end
 
 function Base.show(io::IO, ::MIME"text/plain", the_mpo::MatrixProductOperator)

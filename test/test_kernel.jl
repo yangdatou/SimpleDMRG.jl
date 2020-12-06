@@ -6,7 +6,7 @@ max_bond_dim = 100
 
 function test_kernel(m::ModelSystem{T}, nn::Int) where T    
     @time psi, e   = kernel(m, nn, verbose=5, max_bond_dim=max_bond_dim)
-    h              = get_mpo(m,       nn)
+    h              = build_mpo(m,       nn)
 
     println("e                = ", e)
     println("(psi'*h)*psi     = ", (psi'*h)*psi)

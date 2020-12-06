@@ -1,14 +1,12 @@
-using Printf
-
 include("../src/SimpleDMRG.jl")
 using .SimpleDMRG
 
 nn           = 10
-max_bond_dim = 1000
+max_bond_dim = 20
 
 function test_mpo(m::ModelSystem{T}, nn::Int) where T
-    psi     = get_randn_mps(m, nn, bond_dim=max_bond_dim)
-    h       = get_mpo(m,       nn)
+    psi     = build_randn_mps(m, nn, bond_dim=max_bond_dim)
+    h       = build_mpo(m,       nn)
     
     println("h = ", h)
     display(h)

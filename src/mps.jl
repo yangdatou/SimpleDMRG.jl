@@ -36,7 +36,15 @@ function get_bond_dims(the_mps::MatrixProductState)::Array{Tuple{Int,Int},1}
     return bond_dims
 end
 
-function get_randn_mps(phys_dim::Int, sys_size::Int; bond_dim::Int=50, T=Float64)
+function Base.getindex(the_mps::MatrixProductState{T}, i::Int) where {T}
+    return Base.getindex(the_mps._data, i)::Array{T,3}
+end
+
+function Base.setindex!(the_mps::MatrixProductState{T}, t::Array{T,3}, i::Int) where {T}
+    Base.setindex!(the_mps._data, t, i)
+end
+
+function build_randn_mps(phys_dim::Int, sys_size::Int; bond_dim::Int=50, T=Float64)
     tmp_mps_tensors = [randn(T, 1, bond_dim, phys_dim), [randn(T, bond_dim, bond_dim, phys_dim) for _ in 2:(sys_size-1)]..., randn(T, bond_dim, 1, phys_dim)]
     tmp_mps = MatrixProductState{T}(tmp_mps_tensors)
     left_canonical!(tmp_mps::MatrixProductState{T},  max_bond_dim=bond_dim)
@@ -44,9 +52,9 @@ function get_randn_mps(phys_dim::Int, sys_size::Int; bond_dim::Int=50, T=Float64
     return tmp_mps
 end
 
-function get_randn_mps(m::ModelSystem{T}, sys_size::Int; bond_dim::Int=50) where {T}
+function build_randn_mps(m::ModelSystem{T}, sys_size::Int; bond_dim::Int=50) where {T}
     phys_dim = get_phys_dim(m)
-    return get_randn_mps(phys_dim, sys_size, bond_dim=bond_dim, T=T)
+    return build_randn_mps(phys_dim, sys_size, bond_dim=bond_dim, T=T)
 end
 
 Base.copy(the_mps::MatrixProductState{T}) where {T} = MatrixProductState{T}(the_mps._data)
