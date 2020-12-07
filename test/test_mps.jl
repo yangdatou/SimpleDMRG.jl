@@ -4,7 +4,7 @@ include("../src/SimpleDMRG.jl")
 using .SimpleDMRG
 
 nn           = 20
-max_bond_dim = 1000
+max_bond_dim = 20
 
 function test_mps(m::ModelSystem{T}, nn::Int) where T
     psi     = build_randn_mps(m, nn, bond_dim=max_bond_dim)
@@ -15,7 +15,6 @@ function test_mps(m::ModelSystem{T}, nn::Int) where T
     display(psi')
     @time println("psi'*psi = ", psi'*psi)
 end
-
 
 ising_model = IsingModel(1.0, 1.0, T=ComplexF64)
 test_mps(ising_model, nn)

@@ -32,10 +32,6 @@ function build_mpo(m::ModelSystem{T}, sys_size::Int) where {T}
     return MatrixProductOperator(w::Array{T,4}, sys_size)
 end
 
-function get_data(the_mpo::MatrixProductOperator{T}, l::Int) where {T}
-    return the_mpo._data[l]::Array{T,4}
-end
-
 function get_sys_size(the_mpo::MatrixProductOperator{T})::Int where {T}
     return length(the_mpo._data)
 end

@@ -17,16 +17,12 @@ end
 
 Base.eltype(::Type{MatrixProductState{T}}) where {T} = T
 
-function get_data(the_mps::MatrixProductState{T}, l::Int) where {T}
-    return the_mps._data[l]::Array{T,3}
-end
-
 function get_sys_size(the_mps::MatrixProductState{T})::Int where {T}
     return length(the_mps._data)
 end
 
 function get_phys_dim(the_mps::MatrixProductState)::Int
-    tmp_tensor = get_data(the_mps, 2)
+    tmp_tensor = the_mps[2]
     return length(tmp_tensor[1, 1, :])
 end
 
@@ -125,11 +121,6 @@ function Base.show(io::IO, the_adj_mps::Adjoint{T, MatrixProductState{T}}) where
 end
 
 function Base.getindex(the_mps::Adjoint{T, MatrixProductState{T}}, args...) where {T}
-    out = Base.getindex(the_mps.parent._data, args...)
-    return permutedims(conj.(out), (2, 1, 3))
-end
-
-function get_data(the_mps::Adjoint{T, MatrixProductState{T}}, l::Int) where {T}
-    out = get_data(the_mps.parent, l)::Array{T,3}
+    out = Base.getindex(the_mps.parent._data, args...)::Array{T,3}
     return permutedims(conj.(out), (2, 1, 3))
 end

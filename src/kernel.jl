@@ -38,8 +38,8 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
     if not(isdefined(left_blocks,1)) && not(isdefined(right_blocks,sys_size))
         tmp_right_block    = ones(T, 1, 1, 1)::Array{T, 3}
         for l in sys_size:-1:1
-            tmp_mpo_tensor = get_data(the_mpo, l)::Array{T,4}
-            tmp_mps_tensor = get_data(the_mps, l)::Array{T,3}
+            tmp_mpo_tensor = the_mpo[l]::Array{T,4}
+            tmp_mps_tensor = the_mps[l]::Array{T,3}
             @tensoropt new_right_block[last_a, last_b, last_c] := tmp_mpo_tensor[last_a, this_a, sgm, lam] * (conj.(tmp_mps_tensor))[last_b, this_b, sgm] *  tmp_mps_tensor[last_c, this_c, lam] * tmp_right_block[this_a, this_b, this_c]
             right_blocks[l]   = new_right_block::Array{T,3}
             tmp_right_block   = new_right_block::Array{T,3}
@@ -49,8 +49,8 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
     verbose<3 || println(">>>>>>>>>> Performing Right Sweep >>>>>>>>>>")
     tmp_left_block = ones(T, 1, 1, 1)::Array{T, 3}
     for l in 1:sys_size
-        this_mpo_tensor = get_data(the_mpo, l)::Array{T,4}
-        this_mps_tensor = get_data(the_mps, l)::Array{T,3}
+        this_mpo_tensor = the_mpo[l]::Array{T,4}
+        this_mps_tensor = the_mps[l]::Array{T,3}
 
         if l == sys_size
             tmp_right_block = ones(T, 1, 1, 1)::Array{T, 3}
@@ -68,7 +68,7 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
         the_mps[l]            = new_mps_tensor::Array{T,3}
 
         if 1 <= l < sys_size
-            next_mps_tensor   = get_data(the_mps, l+1)::Array{T,3}
+            next_mps_tensor   = the_mps[l+1]::Array{T,3}
             @tensor next_mps_tensor_p[last_b, this_b, sgm] := (Diagonal(s)*v')[last_b, last_a] * next_mps_tensor[last_a, this_b, sgm]
             the_mps[l+1]      = next_mps_tensor_p::Array{T,3}
         end
@@ -83,8 +83,8 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
 
     verbose<3 || println("<<<<<<<<<< Performing Left Sweep <<<<<<<<<<")
     for l in sys_size:-1:1
-        this_mpo_tensor = get_data(the_mpo, l)::Array{T,4}
-        this_mps_tensor = get_data(the_mps, l)::Array{T,3}
+        this_mpo_tensor = the_mpo[l]::Array{T,4}
+        this_mps_tensor = the_mps[l]::Array{T,3}
 
         if l == 1
             tmp_left_block = ones(T, 1, 1, 1)::Array{T, 3}
@@ -102,7 +102,7 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
         the_mps[l]            = new_mps_tensor::Array{T,3}
 
         if 1 < l <= sys_size
-            last_mps_tensor   = get_data(the_mps, l-1)::Array{T,3}
+            last_mps_tensor   = the_mps[l-1]::Array{T,3}
             @tensor last_mps_tensor_p[last_b, this_b, sgm] := (u*Diagonal(s))[this_a, this_b] * last_mps_tensor[last_b, this_a, sgm]
             the_mps[l-1]      = last_mps_tensor_p::Array{T,3}
         end

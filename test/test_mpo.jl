@@ -22,6 +22,6 @@ end
 ising_model = IsingModel(1.0, 1.0, T=ComplexF64)
 test_mpo(ising_model, nn)
 heis_model  = HeisenbergModel(1.0, 1.0, 1.0, T=ComplexF64)
-test_mpo(heis_model, nn)
+test_mpo(heis_model,  nn)
 hub_model   = HubbardModel(1.0, 1.0, T=ComplexF64)
-test_mpo(hub_model, nn)
+test_mpo(hub_model,   nn)
