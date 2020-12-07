@@ -112,7 +112,7 @@ function sweep!(the_mps::MatrixProductState{T}, the_mpo::MatrixProductOperator{T
         right_blocks[l]       = new_right_block::Array{T,3}
         tmp_right_block       = new_right_block::Array{T,3}
 
-        verbose<5 || @printf("site: %2d, energy: %.12f\n", l, real(e_left))
+        verbose<5 || @printf("site: %2d, energy: %.12f\n", l, real(e_right))
     end
 
     return e_left, e_right
