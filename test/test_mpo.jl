@@ -1,8 +1,8 @@
 include("../src/SimpleDMRG.jl")
 using .SimpleDMRG
 
-nn           = 20
-max_bond_dim = 50
+const nn           = 20
+const max_bond_dim = 50
 
 function test_mpo(m::ModelSystem{T}, nn::Int) where T
     psi     = build_randn_mps(m, nn, bond_dim=max_bond_dim)

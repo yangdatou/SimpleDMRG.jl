@@ -144,7 +144,7 @@ function kernel(the_mps_init::MatrixProductState{T}, the_mpo::MatrixProductOpera
     end
 
     if not(is_converged)
-        verbose < 3 || println("Converged in $iter_num iterations")
+        verbose < 3 || println("Not converged in $iter_num iterations")
     end
 
     clear_cache()
