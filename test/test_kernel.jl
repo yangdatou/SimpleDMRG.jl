@@ -1,7 +1,7 @@
 include("../src/SimpleDMRG.jl")
 using .SimpleDMRG
 
-const max_bond_dim = 25
+const max_bond_dim = 50
 
 function test_kernel(m::ModelSystem{T}, nn::Int) where T    
     @time psi, e   = kernel(m, nn, verbose=5, max_bond_dim=max_bond_dim)
